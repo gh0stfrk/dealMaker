@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<form action="" method="post" id="registerform">
+    <input type="email" name="email" id="email" placeholder="email" required>
+    <input type="password" name="password" id="password" placeholder="Password">
+    <input type="password" name="confirmpassword" id="confirmpassword" placeholder="Confirm Password">
+
+    <input type="submit" value="Register" id="register">
+</form>
+
+<script>
+    const registerForm = document.querySelector('#registerform')
+    const password = document.getElementById('password')
+    const confirmPassword = document.getElementById('confirmpassword')
+    const email = document.getElementById('email')
+    const registerBtn = document.getElementById('register')
+
+    registerBtn.disabled = true
+
+    confirmPassword.addEventListener('keyup', (event) => {
+        if (password.value.length > 5 && confirmPassword.value.length > 5) {
+            if (password.value === confirmPassword.value) {
+                registerBtn.disabled = false
+            } else {
+                registerBtn.disabled = true
+            }
+        }
+    })
+
+    registerForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        const fromData = new FormData(registerForm)
+
+        fetch("http://localhost:5000/register", {
+            method: 'POST',
+            body: fromData
+        })
+
+            .then(resp => resp.json())
+            .then(
+                (data) => {
+                    console.log(data)
+                    if (data['status'] === 'success') {
+                        Swal.fire({
+                            title: "User Registered!",
+                            showCloseButton: true
+                        })
+                    }
+                    else{
+                        Swal.fire({
+                            icon: "error",
+                            title: "Invalid Data",
+                            text: data['message']
+                        })
+                    }
+                }
+            )
+
+        password.value = ""
+        confirmPassword.value = ""
+        email.value = ""
+        registerBtn.disabled = true
+    })
+</script>
+
+{% endblock %}

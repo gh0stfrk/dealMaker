@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+
+{% block css %}
+
+{% endblock %}
+
+{% block content %}
+<div>
+    <h1>dealMaker</h1>
+    <p>Start watching products and get updates when the rate fluctuates</p>
+</div>
+
+<form method="post" id="productform">
+    <input type="url" name="product" id="product" required>
+    <input type="submit" value="Save">
+</form>
+
+<div>
+    <h3>Supported Platforms</h3>
+    <div>
+        <p>Myntra</p>
+    </div>
+</div>
+
+<script defer >
+    const productForm = document.getElementById('productform');
+
+    productForm.addEventListener('submit', (event) => {
+        const url = document.getElementById('product')
+
+        event.preventDefault()
+        if (localStorage.getItem('login')) {
+            const product = new FormData(productForm)
+            fetch('http://localhost:5000/', {
+                method: 'POST',
+                body: product
+            }).then(response => response.json())
+                .then((data) => {
+                    console.log(data)
+                })
+        } else {
+            Swal.fire({
+                title: 'Login / Sign Up',
+                text: "login or signup to continue"
+            })
+        }
+
+        url.value = ""
+    })
+</script>
+
+{% endblock %}

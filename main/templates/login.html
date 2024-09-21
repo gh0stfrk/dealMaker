@@ -1,0 +1,51 @@
+{% extends 'base.html'%}
+
+{% block content %}
+<form method="post" id="login">
+    <input type="email" name="email" id="email" placeholder="email" required>
+    <input type="password" name="password" id="password" placeholder="password">
+    <input type="submit" value="Login">
+</form>
+
+<script>
+    const loginForm = document.getElementById('login');
+    const email = document.getElementById('email')
+    const password = document.getElementById('password')
+
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault()
+
+        const form = new FormData(loginForm)
+
+        fetch('http://localhost:5000/login', {
+            method: 'POST',
+            body: form
+        }).then(response => response.json())
+            .then(
+                (data) => {
+                    if (data['status'] === 'success') {
+                        Swal.fire({
+                            title: "Login Successful",
+                            confirmButtonText: "Okay",
+                        }).then((result) => {
+                            localStorage.setItem("login", true)
+                            if (result.isConfirmed) {
+                                window.location = data['url']
+                            }
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Invalid Data",
+                            text: data['message']
+                        })
+                    }
+                }
+            )
+
+        email.value = ''
+        password.value = ''
+    })
+</script>
+
+{% endblock %}
