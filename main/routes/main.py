@@ -3,6 +3,9 @@ from flask import Blueprint, render_template
 from flask import request
 from flask_login import current_user
 
+from main.scraper import run_spider
+from main.models import Product, User
+
 main = Blueprint('main', __name__)
 
 def extract_product_id(url):
@@ -21,10 +24,9 @@ def home():
         url = request.form.get('product')
 
         if pid := extract_product_id(url):
-            print(pid)
-            print(current_user.is_authenticated)
-            print(current_user.username)
-        return {"status": "success"}
+            return {'url': url, 'data': run_spider(url)}
+    
+        return {"status": "failed", "message": "Invalid Url"}
 
     return render_template("index.html")
 

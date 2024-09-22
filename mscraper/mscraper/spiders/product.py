@@ -5,9 +5,14 @@ import json
 class ProductSpider(scrapy.Spider):
     name = "product"
     allowed_domains = ["myntra.com"]
-    start_urls = [
-        "https://www.myntra.com/24014310"
-    ]
+
+    def start_requests(self):
+        # fetch the list of codes from the database
+        items = [29951923, 30097171, 22183904]
+        for code in items:
+            url = f"https://www.myntra.com/{code}"
+            yield scrapy.Request(url=url, callback=self.parse)
+
 
     def parse(self, response):
         script_tags = response.xpath('//script[@type="application/ld+json"]')
