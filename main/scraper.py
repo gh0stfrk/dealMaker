@@ -4,15 +4,14 @@ import logging
 from scrapy.crawler import CrawlerRunner
 from scrapy.utils.project import get_project_settings
 from twisted.internet import reactor, defer
-from scrapy.signalmanager import dispatcher
-from scrapy import signals
 
 class SinglePageSpider(scrapy.Spider):
     name = 'single_page_spider'
 
-    def __init__(self, url=None, *args, **kwargs):
+    def __init__(self, url=None, data_store=None, *args, **kwargs):
         super(SinglePageSpider, self).__init__(*args, **kwargs)
         self.start_urls = [url] if url else []
+        self.data_store = data_store 
 
     def parse(self, response):
         script_tags = response.xpath('//script[@type="application/ld+json"]')
@@ -20,27 +19,22 @@ class SinglePageSpider(scrapy.Spider):
             text = script_tag.xpath('./text()').get()
             if '"@type" : "Product"' in text:
                 product_data = json.loads(text)
-                yield {
+                # Store the extracted data in the external container
+                self.data_store.append({
                     'name': product_data['name'],
                     'price': product_data['offers']['price'],
                     'url': response.url,
                     'image': product_data['image']
-                }
+                })
 
 def run_spider(url):
     logging.getLogger('scrapy').setLevel(logging.CRITICAL)
     scraped_data = []
-
-    def spider_results(signal, sender, item, response, spider):
-        scraped_data.append(item)
-
-    dispatcher.connect(spider_results, signal=signals.item_passed)
-
     runner = CrawlerRunner(get_project_settings())
     
     @defer.inlineCallbacks
     def crawl():
-        yield runner.crawl(SinglePageSpider, url=url)
+        yield runner.crawl(SinglePageSpider, url=url, data_store=scraped_data)
         reactor.stop()
 
     crawl()

@@ -4,8 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DealMkr</title>
+    <title>dealMaker</title>
     <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     {% block css %}
     {% endblock %}
 
@@ -18,13 +28,16 @@
         <div class="logo">
             <a href="{{ url_for('main.home') }}"><img src="#" alt="">dealMaker</a>
         </div>
-        <div>
+        <div class="nav-menu">
+            <i class="fa-solid fa-bars"></i>
+        </div>
+        <div class="links" id="nav-links">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.home') }}">Home</a>
-                <a href="{{ url_for('auth.sign_out')}}" id="signout">Sign Out</a>
+            <a href="{{ url_for('main.home') }}">Home</a>
+            <a href="{{ url_for('auth.sign_out')}}" id="signout">Sign Out</a>
             {% else %}
-                <a href="{{ url_for('auth.register')}}">Sign Up</a>
-                <a href="{{ url_for('auth.login')}}">Login</a>
+            <a href="{{ url_for('auth.register')}}">Sign Up</a>
+            <a href="{{ url_for('auth.login')}}">Login</a>
             {% endif %}
         </div>
     </nav>
@@ -37,15 +50,28 @@
     <footer class="footer">
         <p>&copy; dealMaker</p>
     </footer>
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script defer >
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    {% if current_user.is_authenticated %}
+    <script defer>
         const signOut = document.getElementById('signout')
 
-        signOut.addEventListener('click', ()=> {
+        var nav = document.querySelector(".nav-menu");
+
+        signOut.addEventListener('click', () => {
             localStorage.clear()
             localStorage.removeItem('login')
         })
+    </script>
+    {%endif%}
 
+    <script>
+        $('.nav-menu').click(function(){
+            const navLinks = $('#nav-links');
+            navLinks.toggleClass('active')
+        })
     </script>
 </body>
 
